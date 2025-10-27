@@ -1,0 +1,37 @@
+---
+title: "App Prep"
+format: html
+editor: visual
+---
+
+## Mobile Device Usage and User Behavior Dataset
+
+Read in the dataset. 
+```{r}
+library(readr)
+library(dplyr)
+
+mobile_usage <- read_csv("user_behavior_dataset.csv")
+head(mobile_usage)
+```
+```{r}
+# Checking structure to confirm variables read in correctly
+str(mobile_usage)
+```
+
+```{r}
+# Converting categorical variables into factor variables
+mobile_usage <- mobile_usage |>
+  mutate(behavior_classF = as.factor(`User Behavior Class`),
+         device_modelF = as.factor(`Device Model`),
+         operating_systemF = as.factor(`Operating System`))
+
+```
+
+```{r}
+# Checking for rate of missing values
+colSums(is.na(mobile_usage))
+```
+No missing values in the dataset! 
+
+
