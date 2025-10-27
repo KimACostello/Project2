@@ -6,14 +6,17 @@ editor: visual
 
 ## Mobile Device Usage and User Behavior Dataset
 
-Read in the dataset. 
+Read in the dataset.
+
 ```{r}
 library(readr)
 library(dplyr)
+library(tidyr)
 
 mobile_usage <- read_csv("user_behavior_dataset.csv")
 head(mobile_usage)
 ```
+
 ```{r}
 # Checking structure to confirm variables read in correctly
 str(mobile_usage)
@@ -32,6 +35,73 @@ mobile_usage <- mobile_usage |>
 # Checking for rate of missing values
 colSums(is.na(mobile_usage))
 ```
-No missing values in the dataset! 
 
+No missing values in the dataset!
+
+## Investigating the Data
+
+### Categorical Variables
+
+```{r}
+# One-way contingency table for Operating System
+table(mobile_usage$operating_systemF)
+```
+
+There are a lot more Android users than iPhone users!
+
+```{r}
+# One-way contingency table for Device Models
+table(mobile_usage$device_modelF)
+```
+
+The number of users for each device model is fairly even between models. However, OnePlus 9 and Samsung Galaxy S21 have the lowest number of users.
+
+```{r}
+# Two-way contingency table of User Behavior Class by Gender
+mobile_usage |>
+  group_by(Gender, behavior_classF) |>
+  summarize(count = n()) |>
+  pivot_wider(names_from = behavior_classF, values_from = count)
+```
+
+User behavior classes are from 1 to 5, ranging from light (1) to extreme usage (5). There are more males considered as extreme usage than females. Females have the greatest number of users in the mid-usage range. Although males have a greater number of extreme usage users than females, the greatest number of male users are at a mid-low usage.
+
+```{r}
+# Two-way contingency table of Device Models by Gender
+table(mobile_usage$Gender, mobile_usage$device_modelF)
+```
+
+The greatest number of male users have a Samsung Galaxy, which is the least popular among females.
+
+```{r}
+table(mobile_usage$Gender, mobile_usage$operating_systemF)
+```
+
+The number of males vs females per operating system is close in numbers. There are more male Android users, however there are more male users than female users (in general) in this dataset.
+
+### Numeric Variables
+
+
+```{r}
+mobile_usage |>
+  group_by(Gender) |>
+  summarize(across(.cols = c(`App Usage Time (min/day)`, 
+                             `Screen On Time (hours/day)`, 
+                             `Data Usage (MB/day)`),
+                   .fns = list("mean" = mean, 
+                               "median" = median, 
+                               "sd" = sd),
+                   .names = "{.fn}_{.col}"))
+```
+
+```{r}
+mobile_usage |>
+  group_by(behavior_classF, Gender) |>
+  summarize(across(.cols = c(`Screen On Time (hours/day)`, 
+                             `Data Usage (MB/day)`),
+                   .fns = list("mean" = mean, 
+                               "median" = median, 
+                               "sd" = sd),
+                   .names = "{.fn}_{.col}"))
+```
 
