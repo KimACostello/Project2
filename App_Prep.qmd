@@ -12,9 +12,14 @@ Read in the dataset.
 library(readr)
 library(dplyr)
 library(tidyr)
+library(janitor)
+library(ggplot2)
 
 mobile_usage <- read_csv("user_behavior_dataset.csv")
 head(mobile_usage)
+
+# Fix variable names 
+mobile_usage <- clean_names(mobile_usage, "snake")
 ```
 
 ```{r}
@@ -25,9 +30,11 @@ str(mobile_usage)
 ```{r}
 # Converting categorical variables into factor variables
 mobile_usage <- mobile_usage |>
-  mutate(behavior_classF = as.factor(`User Behavior Class`),
-         device_modelF = as.factor(`Device Model`),
-         operating_systemF = as.factor(`Operating System`))
+  mutate(behavior_classF = as.factor(user_behavior_class),
+         device_modelF = as.factor(device_model),
+         operating_systemF = as.factor(operating_system),
+         user_id = as.character(user_id),
+         user_behavior_class = as.character(user_behavior_class))
 
 ```
 
@@ -59,7 +66,7 @@ The number of users for each device model is fairly even between models. However
 ```{r}
 # Two-way contingency table of User Behavior Class by Gender
 mobile_usage |>
-  group_by(Gender, behavior_classF) |>
+  group_by(gender, behavior_classF) |>
   summarize(count = n()) |>
   pivot_wider(names_from = behavior_classF, values_from = count)
 ```
@@ -68,40 +75,141 @@ User behavior classes are from 1 to 5, ranging from light (1) to extreme usage (
 
 ```{r}
 # Two-way contingency table of Device Models by Gender
-table(mobile_usage$Gender, mobile_usage$device_modelF)
+table(mobile_usage$gender, mobile_usage$device_modelF)
 ```
 
 The greatest number of male users have a Samsung Galaxy, which is the least popular among females.
 
 ```{r}
-table(mobile_usage$Gender, mobile_usage$operating_systemF)
+table(mobile_usage$gender, mobile_usage$operating_systemF)
 ```
 
 The number of males vs females per operating system is close in numbers. There are more male Android users, however there are more male users than female users (in general) in this dataset.
 
 ### Numeric Variables
 
-
+The following is to view measures of center and spread by gender for App Usage Time, Screen Time, and Data Usage. 
 ```{r}
 mobile_usage |>
-  group_by(Gender) |>
-  summarize(across(.cols = c(`App Usage Time (min/day)`, 
-                             `Screen On Time (hours/day)`, 
-                             `Data Usage (MB/day)`),
+  group_by(gender) |>
+  summarize(across(.cols = c(app_usage_time_min_day, 
+                             screen_on_time_hours_day, 
+                             data_usage_mb_day),
                    .fns = list("mean" = mean, 
                                "median" = median, 
                                "sd" = sd),
                    .names = "{.fn}_{.col}"))
 ```
 
+The following is to view measures of center and spread by Gender and User Behavior Class for Screen Time and Data Usage.
+
 ```{r}
 mobile_usage |>
-  group_by(behavior_classF, Gender) |>
-  summarize(across(.cols = c(`Screen On Time (hours/day)`, 
-                             `Data Usage (MB/day)`),
+  group_by(behavior_classF, gender) |>
+  summarize(across(.cols = c(screen_on_time_hours_day, 
+                             data_usage_mb_day),
                    .fns = list("mean" = mean, 
                                "median" = median, 
-                               "sd" = sd),
+                               "sd" = sd,
+                               "min" = min,
+                               "max" = max),
                    .names = "{.fn}_{.col}"))
+```
+
+### Plots
+
+Plot 1: Side-by-side barplot 
+```{r}
+g <- ggplot(data = mobile_usage)
+g + geom_bar(aes(x = behavior_classF, fill = gender), 
+             position = "dodge", 
+             color = "black", 
+             alpha = 0.6) +
+  labs(x = "User Behavior Class", 
+       y = "Number of Users",
+       title = "Number of Users in Each User Behavior Class by Gender",
+       fill = "Gender") +
+  ggeasy::easy_center_title() +
+  scale_fill_manual(values = c("lightpink",
+                               "lightblue")) +
+  facet_wrap(~ operating_systemF)
+```
+
+Plot 2: Boxplot
+```{r}
+g + geom_boxplot(aes(x = behavior_classF, y = screen_on_time_hours_day, fill = gender)) +
+  labs(x = "User Behavior Class", 
+       y = "Screen Time (hours per day)",
+       title = "Screen Time by User Behavior Class",
+       fill = "Gender") +
+  ggeasy::easy_center_title() +
+  scale_fill_manual(values = c("lightpink",
+                               "lightblue"))
+```
+
+Plot 3: Scatterplot
+```{r}
+g + geom_point(aes(x = number_of_apps_installed, 
+                   y = screen_on_time_hours_day, 
+                   color = operating_systemF)) +
+  labs(x = "Number of Apps Installed", 
+       y = "Screen Time (hours per day)",
+       title = "Screen Time by Number of Apps Installed on Mobile Device",
+       color = "Operating System") +
+  ggeasy::easy_center_title() +
+  scale_color_manual(values = c("#FFFF00",
+                                "#FF00FF")) +
+  theme_dark()
+```
+
+Plot 4: Cross between Scatter and 2D Density Plot
+```{r}
+library(ggpointdensity)
+library(viridis)
+
+g + geom_pointdensity(aes(x = age, y = number_of_apps_installed)) +
+  scale_color_viridis()
+```
+
+```{r}
+g + geom_point(aes(x = screen_on_time_hours_day, 
+                   y = battery_drain_m_ah_day, 
+                   size = data_usage_mb_day))
+```
+
+Correlation Matrix Plot
+```{r}
+library(GGally)
+
+df_corr <- mobile_usage |>
+  select(where(is.numeric)) |>
+  rename("App_Usage" = app_usage_time_min_day,
+         "Screen Time" = screen_on_time_hours_day,
+         "Battery Drain" = battery_drain_m_ah_day,
+         "Number of Apps" = number_of_apps_installed,
+         "Data Usage" = data_usage_mb_day,
+         "Age" = age)
+
+ggcorr(df_corr, 
+       label = TRUE)
+```
+
+
+Plot 5: Half-violin Half-dot plot
+```{r}
+library(see)
+
+g +
+  geom_violindot(aes(x = behavior_classF, 
+                     y = screen_on_time_hours_day, 
+                     fill = behavior_classF),
+                 fill_dots = "black") +
+  theme_modern() +
+  scale_fill_material_d() +
+  labs(x = "User Behavior Class", 
+       y = "Screen Time (hours per day)",
+       title = "Screen Time by User Behavior Class",
+       fill = "User Behavior Class") +
+  ggeasy::easy_center_title()
 ```
 
