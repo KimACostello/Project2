@@ -88,7 +88,8 @@ The number of males vs females per operating system is close in numbers. There a
 
 ### Numeric Variables
 
-The following is to view measures of center and spread by gender for App Usage Time, Screen Time, and Data Usage. 
+The following is to view measures of center and spread by gender for App Usage Time, Screen Time, and Data Usage.
+
 ```{r}
 mobile_usage |>
   group_by(gender) |>
@@ -118,7 +119,8 @@ mobile_usage |>
 
 ### Plots
 
-Plot 1: Side-by-side barplot 
+Plot 1: Side-by-side barplot
+
 ```{r}
 g <- ggplot(data = mobile_usage)
 g + geom_bar(aes(x = behavior_classF, fill = gender), 
@@ -136,6 +138,7 @@ g + geom_bar(aes(x = behavior_classF, fill = gender),
 ```
 
 Plot 2: Boxplot
+
 ```{r}
 g + geom_boxplot(aes(x = behavior_classF, y = screen_on_time_hours_day, fill = gender)) +
   labs(x = "User Behavior Class", 
@@ -148,6 +151,7 @@ g + geom_boxplot(aes(x = behavior_classF, y = screen_on_time_hours_day, fill = g
 ```
 
 Plot 3: Scatterplot
+
 ```{r}
 g + geom_point(aes(x = number_of_apps_installed, 
                    y = screen_on_time_hours_day, 
@@ -163,6 +167,7 @@ g + geom_point(aes(x = number_of_apps_installed,
 ```
 
 Plot 4: Correlation Matrix Plot
+
 ```{r}
 library(GGally)
 
@@ -185,8 +190,8 @@ ggcorr(df_corr,
   ggeasy::easy_center_title()
 ```
 
-
 Plot 5: Half-violin Half-dot plot
+
 ```{r}
 library(see)
 
@@ -204,6 +209,7 @@ g + geom_violindot(aes(x = behavior_classF,
 ```
 
 Plot 6: Cross between Scatterplot and 2D Density Plot
+
 ```{r}
 library(ggpointdensity)
 library(viridis)
@@ -218,7 +224,9 @@ g + geom_pointdensity(aes(x = age, y = screen_on_time_hours_day)) +
   theme(plot.subtitle = element_text(hjust = 0.5)) +
   facet_wrap(~ operating_systemF)
 ```
+
 Plot 7: Density Plot
+
 ```{r}
 g + geom_density(aes(x = data_usage_mb_day, fill = operating_systemF), 
                  alpha = 0.3) +
@@ -228,4 +236,3 @@ g + geom_density(aes(x = data_usage_mb_day, fill = operating_systemF),
        title = "Distribution of Data Usage by Operating System") +
   theme(plot.title = element_text(hjust = 0.5))
 ```
-
