@@ -109,7 +109,10 @@ ui <- fluidPage(
                      downloadButton("download_data", "Download CSV")
                      ), 
             
-            tabPanel("Data Exploration", "UPDATE CONTENT")
+            tabPanel("Data Exploration", 
+                     tabsetPanel(
+                       tabPanel("Data Summaries", "CONTENT"),
+                       tabPanel("Plots", "CONTENT")))
           )
            
         )
