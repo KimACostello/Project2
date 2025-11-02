@@ -1,6 +1,7 @@
 
 library(shiny)
 library(bslib)
+library(DT)
 
 source("helpers.R")
 
@@ -44,14 +45,14 @@ ui <- fluidPage(
                                             "Low-Moderate Usage",
                                             "Moderate Usage",
                                             "Moderate-High Usage",
-                                            "High Usage",
-                                            "All Usage Levels"),
+                                            "High Usage"),
                          choiceValues = list(behavior_vals[1],
                                              behavior_vals[2],
                                              behavior_vals[3],
                                              behavior_vals[4],
-                                             behavior_vals[5],
-                                             behavior_vals)),
+                                             behavior_vals[5]), 
+                         selected = c("1", "2", "3", "4", "5")
+                         ),
             
             br(),
             
@@ -83,18 +84,26 @@ ui <- fluidPage(
                         max = 0, 
                         value = c(0, 0),
                         step = 1,
-                        round = TRUE)
+                        round = TRUE),
             
-            
+            actionButton(inputId = "subset_data", "Subset the Data!")
             
             ),
         
         
-        
-        
+
           
         # Main Panel
         mainPanel(
+          tabsetPanel(
+            
+            tabPanel("About", "UPDATE CONTENT"),
+            
+            tabPanel("Data Download", 
+                     dataTableOutput(outputId = "subsetted_data")), 
+            
+            tabPanel("Data Exploration", "UPDATE CONTENT")
+          )
            
         )
     
@@ -119,7 +128,8 @@ server <- function(input, output, session) {
                     value = c(min(mobile_usage[input$num_var1]),
                               max(mobile_usage[input$num_var1]))
                     )
-    
+
+# Updating Slider2 widget based on selection of second numeric variable
     updateSliderInput(session, 
                       "slider2", 
                       max = max(mobile_usage[input$num_var2]),
@@ -127,9 +137,53 @@ server <- function(input, output, session) {
                       value = c(min(mobile_usage[input$num_var2]),
                                 max(mobile_usage[input$num_var2]))
     )
-    
   })
-}
+  
+  # Create reactive values  
+  subset_data <- reactiveValues(usage_data = NULL)
+    
+  observeEvent(input$subset_data, {
+      
+      if(input$opsystem == "Android"){
+        os_sub <- opsystem_vals[1]
+      } else if(input$opsystem == "iOS"){
+        os_sub <- opsystem_vals[2]
+      } else{
+        os_sub <- opsystem_vals
+      }
+      
+      
+      if(input$gender == "Male"){
+        gender_sub <- gender_vals[1]
+      } else if(input$gender == "Female"){
+        gender_sub <- gender_vals[2]
+      } else{
+        gender_sub <- gender_vals
+      }
+      
+
+      filtered_data <- mobile_usage |>
+        filter(operating_system == os_sub,
+               gender == gender_sub,
+               user_behavior_class %in% input$behavior_class)
+        
+      
+      #Update the subset_data reactive value object
+      subset_data$usage_data <- filtered_data |>
+        clean_names(case = "title")
+      
+    })
+  
+  output$subsetted_data <- renderDataTable(subset_data$usage_data)
+  
+  
+  
+  }
+  
+  
+  
+  
+
 
 # Run the application 
 shinyApp(ui = ui, server = server)
