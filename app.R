@@ -75,7 +75,8 @@ ui <- fluidPage(
             #Allows user to select another numeric variable
             selectInput(inputId = "num_var2",
                         label = "Select second numeric variable:",
-                        choices = numeric_vars),
+                        choices = numeric_vars,
+                        selected = numeric_vars[2]),
             
             #Allows user to select the range of the second numeric variable
             sliderInput(inputId = "slider2", 
@@ -100,7 +101,13 @@ ui <- fluidPage(
             tabPanel("About", "UPDATE CONTENT"),
             
             tabPanel("Data Download", 
-                     dataTableOutput(outputId = "subsetted_data")), 
+                     
+                     #Output the data table based on selections in side panel
+                     dataTableOutput(outputId = "subsetted_data"),
+                     
+                     #Allows user to download the data as a CSV file
+                     downloadButton("download_data", "Download CSV")
+                     ), 
             
             tabPanel("Data Exploration", "UPDATE CONTENT")
           )
@@ -116,7 +123,7 @@ mobile_usage <- clean_names(mobile_usage, "snake")
 
 # Define server logic 
 server <- function(input, output, session) {
-  
+
   
   observe({
   
@@ -184,6 +191,15 @@ server <- function(input, output, session) {
   output$subsetted_data <- renderDataTable(subset_data$usage_data)
   
   
+  #Allows user to download the data table
+  output$download_data <- downloadHandler(
+    filename = function(){
+      paste('mobile_usage_data-',Sys.Date(), '.csv', sep = '')
+    },
+    content = function(con){
+      write.csv(subset_data$usage_data, con)
+    }
+  )
   
   }
   
