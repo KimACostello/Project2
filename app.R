@@ -25,8 +25,8 @@ ui <- fluidPage(
                                            "Both"),
                         choiceValues = list(opsystem_vals[1],
                                              opsystem_vals[2],
-                                             opsystem_vals)
-            ),
+                                             opsystem_vals),
+                        ),
             
             #Allows user to select gender
             radioButtons(inputId = "gender",
@@ -36,7 +36,8 @@ ui <- fluidPage(
                                             "Both"),
                          choiceValues = list(gender_vals[1],
                                              gender_vals[2],
-                                             gender_vals)), 
+                                             gender_vals),
+                         ), 
             
             #Allows user to select user behavior class
             checkboxGroupInput(inputId = "behavior_class",
@@ -111,14 +112,32 @@ ui <- fluidPage(
             
             tabPanel("Data Exploration", 
                      tabsetPanel(
-                       tabPanel("Data Summaries", "CONTENT"),
-                       tabPanel("Plots", "CONTENT")))
+                       
+                       tabPanel("Data Summaries", 
+                                
+                                selectInput("summaries",
+                                            label = "Select type of summaries", 
+                                            choices = c("Categorical", "Numeric"),
+                                            selected = "Categorical"),
+                                
+                                conditionalPanel(
+                                  condition = "input.summaries == 'Categorical'",
+                                  checkboxGroupInput(inputId = "categorical_vars",
+                                                     "Select categorical variables to summarize:",
+                                                     choices = clean_cat_vars[-5]),
+                                  uiOutput("contingency_table_output")
+                                  )
+                                  
+                                ),
+                                
+                                
+                       tabPanel("Plots", "CONTENT"))))
           )
            
         )
     
     )
-)
+
 
 #Read in data
 mobile_usage <- read_csv("user_behavior_dataset.csv")
@@ -203,6 +222,31 @@ server <- function(input, output, session) {
       write.csv(subset_data$usage_data, con)
     }
   )
+  
+  # Render the contingency table dynamically
+  output$contingency_table_output <- renderUI({
+    req(input$categorical_vars) # Require at least one variable to be selected
+  
+    df <- subset_data$usage_data[,input$categorical_vars]
+    
+    if (length(input$categorical_vars) == 1) {
+      renderTable({
+        table(df[1])
+      }, rownames = TRUE)
+    } else if (length(input$categorical_vars) == 2) {
+      renderTable({
+        table(df[[1]], df[[2]])
+      }, rownames = TRUE)
+    } else if (length(input$categorical_vars) == 3) {
+      renderTable({
+        table(df[[1]], df[[2]], df[[3]])
+      }, rownames = TRUE) 
+      }
+    })
+  
+  
+  
+  
   
   }
   

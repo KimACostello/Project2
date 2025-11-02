@@ -1,11 +1,17 @@
 ##########################################
 #Info about the data
 
-cat_vars <- c("User Behavior Class" = "behavior_classF",
-              "Device Model" = "device_modelF",
-              "Operating System" = "operating_systemF",
+cat_vars <- c("User Behavior Class" = "user_behavior_class",
+              "Device Model" = "device_model",
+              "Operating System" = "operating_system",
               "Gender" = "gender",
               "User ID" = "user_id")
+
+clean_cat_vars <- c("User Behavior Class" = "User Behavior Class",
+                    "Device Model" = "Device Model",
+                    "Operating System" = "Operating System",
+                    "Gender" = "Gender",
+                    "User ID" = "User ID")
 
 numeric_vars <- c("App Usage (min/day)" = "app_usage_time_min_day",
                   "Screen Time (hours/day)" = "screen_on_time_hours_day",
