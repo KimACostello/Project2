@@ -160,12 +160,19 @@ server <- function(input, output, session) {
       } else{
         gender_sub <- gender_vals
       }
-      
-
-      filtered_data <- mobile_usage |>
+    
+    num1_col <- mobile_usage[[input$num_var1]]
+    num2_col <- mobile_usage[[input$num_var2]]
+    
+    filtered_data <- mobile_usage |>
         filter(operating_system == os_sub,
                gender == gender_sub,
-               user_behavior_class %in% input$behavior_class)
+               user_behavior_class %in% input$behavior_class,
+               num1_col >= input$slider1[1],
+               num1_col <= input$slider1[2],
+               num2_col >= input$slider2[1],
+               num2_col <= input$slider2[2]
+               )
         
       
       #Update the subset_data reactive value object
