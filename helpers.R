@@ -19,6 +19,12 @@ numeric_vars <- c("App Usage (min/day)" = "app_usage_time_min_day",
                   "# of Apps Installed" = "number_of_apps_installed",
                   "Data Usage (MB/day)" = "data_usage_mb_day")
 
+clean_num_vars <- c("App Usage (min/day)" = "App Usage Time Min Day",
+                  "Screen Time (hours/day)" = "Screen on Time Hours Day",
+                  "Battery Drain (mAh/day)" = "Battery Drain m Ah Day",
+                  "# of Apps Installed" = "Number of Apps Installed",
+                  "Data Usage (MB/day)" = "Data Usage Mb Day")
+
 behavior_vals <- c("Low" = "1",
                    "Low-Moderate" = "2",
                    "Moderate" = "3",

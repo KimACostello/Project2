@@ -2,6 +2,7 @@
 library(shiny)
 library(bslib)
 library(DT)
+library(dplyr)
 
 source("helpers.R")
 
@@ -103,10 +104,10 @@ ui <- fluidPage(
             
             tabPanel("Data Download", 
                      
-                     #Output the data table based on selections in side panel
+                     # Output the data table based on selections in side panel
                      dataTableOutput(outputId = "subsetted_data"),
                      
-                     #Allows user to download the data as a CSV file
+                     # Allows user to download the data as a CSV file
                      downloadButton("download_data", "Download CSV")
                      ), 
             
@@ -115,18 +116,38 @@ ui <- fluidPage(
                        
                        tabPanel("Data Summaries", 
                                 
+                      # Allows user to select Numeric or Categorical Summaries
                                 selectInput("summaries",
                                             label = "Select type of summaries", 
                                             choices = c("Categorical", "Numeric"),
                                             selected = "Categorical"),
                                 
+                      # If Categorical is chosen, this will ask for user to select                       # which categorical variables
                                 conditionalPanel(
                                   condition = "input.summaries == 'Categorical'",
                                   checkboxGroupInput(inputId = "categorical_vars",
-                                                     "Select categorical variables to summarize:",
+                                                     "Select categorical variables
+                                                     to summarize:",
                                                      choices = clean_cat_vars[-5]),
+                                  
+                                  # Output contingency table for selected cat vars
                                   uiOutput("contingency_table_output")
-                                  )
+                                  ),
+                      
+                      conditionalPanel(
+                        condition = "input.summaries == 'Numeric'",
+                        checkboxGroupInput(inputId = "numeric_var_options",
+                                           label = "Select numeric variables
+                                                     to summarize:",
+                                           choices = clean_num_vars),
+                        
+                        selectInput(inputId = "group",
+                                    label = "Select Group:",
+                                    choices = clean_cat_vars[-5]),
+                        
+                        # Output numeric summaries for selected numeric vars
+                        uiOutput("numeric_summaries_output")
+                      )
                                   
                                 ),
                                 
@@ -170,7 +191,8 @@ server <- function(input, output, session) {
   
   # Create reactive values  
   subset_data <- reactiveValues(usage_data = NULL)
-    
+  
+  # Sub-setting the Data  
   observeEvent(input$subset_data, {
       
       if(input$opsystem == "Android"){
@@ -180,7 +202,6 @@ server <- function(input, output, session) {
       } else{
         os_sub <- opsystem_vals
       }
-      
       
       if(input$gender == "Male"){
         gender_sub <- gender_vals[1]
@@ -223,6 +244,7 @@ server <- function(input, output, session) {
     }
   )
   
+
   # Render the contingency table dynamically
   output$contingency_table_output <- renderUI({
     req(input$categorical_vars) # Require at least one variable to be selected
@@ -247,6 +269,27 @@ server <- function(input, output, session) {
       })
     }
     })
+  
+  # Render the numeric summaries dynamically
+  output$numeric_summaries_output <- renderUI({
+    req(input$numeric_var_options) # Require at least one variable to be selected
+    
+    df <- subset_data$usage_data
+    
+    renderTable({
+      df |>
+        dplyr::group_by(df[[input$group]]) |>
+        summarize(across(.cols = input$numeric_var_options,
+                         .fns = list("mean" = mean, 
+                                     "median" = median, 
+                                     "sd" = sd),
+                         .names = "{.fn}_{.col}"))
+      
+    })
+      
+    
+   
+  })
   
   
   
