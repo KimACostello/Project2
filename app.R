@@ -152,7 +152,25 @@ ui <- fluidPage(
                                 ),
                                 
                                 
-                       tabPanel("Plots", "CONTENT"))))
+                       tabPanel("Plots", 
+                                
+                                selectInput(inputId = "bar_x",
+                                            label = "Select variable for barplot:",
+                                            choices = clean_cat_vars[-5]
+                                            ),
+                                
+                                selectInput(inputId = "bar_fill",
+                                            label = "Select a subgroup:",
+                                            choices = clean_cat_vars[-5]
+                                            ), 
+                                
+                                selectInput(inputId = "bar_facet",
+                                            label = "Select faceting group:", 
+                                            choices = clean_cat_vars[-5]
+                                            ),
+                                
+                                plotOutput(outputId = "barplot")
+                                ))))
           )
            
         )
@@ -286,10 +304,22 @@ server <- function(input, output, session) {
                          .names = "{.fn}_{.col}"))
       
     })
-      
-    
    
   })
+  
+  output$barplot <- renderPlot({
+    
+    ggplot(data = subset_data$usage_data) +
+      geom_bar(aes(x = input$bar_x, fill = input$bar_fill), 
+               position = "dodge", 
+               color = "black", 
+               alpha = 0.6) +
+      facet_wrap(~ input$bar_facet)
+  })
+  
+  
+  
+  
   
   
   
