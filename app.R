@@ -241,7 +241,11 @@ server <- function(input, output, session) {
       renderTable({
         table(df[[1]], df[[2]], df[[3]])
       }, rownames = TRUE) 
-      }
+    } else if (length(input$categorical_vars) == 4) {
+      renderTable({
+        table(df[[1]], df[[2]], df[[3]], df[[4]])
+      })
+    }
     })
   
   
