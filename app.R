@@ -20,7 +20,7 @@ source("helpers.R")
 ui <- fluidPage(
 
     # Application title
-    titlePanel("Mobile Device Usage Dataset"),
+    titlePanel(tags$b("Mobile Device Usage App")),
     theme = bs_theme(preset = "yeti"),
 
     # Sidebar
@@ -111,7 +111,30 @@ ui <- fluidPage(
         mainPanel(
           tabsetPanel(
             
-            tabPanel("About", "UPDATE CONTENT"),
+            tabPanel("About",
+                     
+                     br(),
+                     
+                     h4(tags$u("About the Mobile Device Usage App")),
+                     
+                     br(),
+                     
+                     h5(tags$b("Purpose:")),
+                     tags$p("     This Mobile Device Usage App allows you to subset and explore data about mobile device usage from 700 individual users. The dataset provides analysis of mobile usage patterns and user behvavior classification. "),
+                     
+                     tags$p("     Users are categorized into 1 of 5 User Behavior Classes based on usage patterns:"),
+                     tags$menu(tags$li("1 = Low Usage"),
+                               tags$li("2 = Low-Moderate Usage"),
+                               tags$li("3 = Moderate Usage"),
+                               tags$li("4 = Moderate-High Usage"),
+                               tags$li("5 = High Usage"),),
+                     
+                     h5(tags$b("Source:")),
+                     
+                     tags$p("The data is provided by Kaggle datasets expert, Vala Khorasani, and more information can be found here:"),
+                     tags$a(href = "https://www.kaggle.com/datasets/valakhorasani/mobile-device-usage-and-user-behavior-dataset", "Source Data Here")
+                     
+                     ),
             
             tabPanel("Data Download", 
                      
@@ -713,17 +736,10 @@ server <- function(input, output, session) {
     })
   })
   
-  
-  
-  
-  
-  
-  
   }
   
   
-  
-  
+
 
 
 # Run the application 
