@@ -59,3 +59,10 @@ var_dictionary <- c("User Behavior Class" = "User Behavior Class",
                     "Number of Apps Installed" = "# of Apps Installed",
                     "Data Usage Mb Day" = "Data Usage (MB/day)",
                     "Age" = "Age")
+
+corr_dictionary <- c("App Usage Time Min Day" = "App Usage",
+                     "Screen on Time Hours Day" = "Screen Time",
+                     "Battery Drain m Ah Day" =  "Battery Drain",
+                     "Number of Apps Installed" = "# of Apps",
+                     "Data Usage Mb Day" = "Data Usage",
+                     "Age" = "Age")

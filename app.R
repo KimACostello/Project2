@@ -3,9 +3,15 @@ library(shiny)
 library(bslib)
 library(DT)
 library(dplyr)
+library(readr)
+library(tidyr)
+library(janitor)
 library(see)
 library(ggpointdensity)
 library(viridis)
+library(GGally)
+library(shinyalert)
+library(ggplot2)
 
 source("helpers.R")
 
@@ -18,7 +24,7 @@ ui <- fluidPage(
 
     # Sidebar
     sidebarLayout(
-        sidebarPanel(
+        sidebarPanel(width = 3,
           
               h4("Let's subset the data!"),
               
@@ -118,7 +124,7 @@ ui <- fluidPage(
             tabPanel("Data Exploration", 
                      tabsetPanel(
                        
-                       tabPanel("Data Summaries", 
+                       tabPanel("Summaries", 
                                 
                                 br(),
                                 
@@ -242,8 +248,13 @@ ui <- fluidPage(
                      plotOutput(outputId = "boxplot")
             ),
             
-            tabPanel("Violin/Dot Plot",
+            tabPanel("Violin Plot",
                      
+                     br(),
+                     
+                     "This plot is a combination of a Violin Plot and a Dot Plot.",
+                     
+                     br(),
                      br(),
                      
                      # Allows user to select violin/dot plot options
@@ -321,12 +332,25 @@ ui <- fluidPage(
                      actionButton("go_comboplot", "Create combo plot!"),
                      
                      plotOutput(outputId = "combo_plot")
-            )
+            ),
             
-            
-            
-            
-            
+            tabPanel("Correlation",
+                     
+                     br(),
+                     
+                     # Allows user to select numeric variables for correlation matrix
+                     fluidRow(
+                       column(3,checkboxGroupInput(inputId = "corr_vars",
+                                                   "Select at least two variables:",
+                                                   choices = combo_num_vars),
+                              actionButton("go_corrplot", "Create correlation matrix!")
+                       ),
+                       
+                       column(9,plotOutput(outputId = "corr_plot")
+                              )
+                       )
+                     )
+
             )))
           )
            
@@ -579,6 +603,30 @@ server <- function(input, output, session) {
         scale_color_viridis() +
         labs(dictionary = var_dictionary) +
         facet_wrap(~ get(facet))
+    })
+  })
+  
+  # Render the correlation matrix
+  observeEvent(input$go_corrplot, {
+    
+    output$corr_plot <- renderPlot({
+      
+      x <- isolate(input$corr_vars)
+      
+      # Users will get an error message if they don't select two
+      if (length(x) <2) shinyalert(text = "Please select at least two variables!")
+      
+      df_corr <- subset_data$usage_data[,x]
+      
+      ggcorr(df_corr,
+             nbreaks = 6,
+             label = TRUE,
+             palette = "BuPu",
+             size = 3,
+             label_size = 6,
+             hjust = 0.50,
+             angle = -15,
+             layout.exp = 1)
     })
   })
   
