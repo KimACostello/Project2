@@ -129,10 +129,52 @@ ui <- fluidPage(
                                tags$li("4 = Moderate-High Usage"),
                                tags$li("5 = High Usage"),),
                      
+                     br(),
+                     
+                     tags$p("Other key features of this dataset include:",
+                            tags$menu(tags$li("User ID: Unique identifier for each user."),
+                                      tags$li("Device Model: Model of the user's smartphone."),
+                                      tags$li("Operating System: The OS of the device (iOS or Android)."),
+                                      tags$li("App Usage Time: Daily time spent on mobile applications, measured in minutes."),
+                                      tags$li("Screen On Time: Average hours per day the screen is active."),
+                                      tags$li("Battery Drain: Daily battery consumption in mAh."),
+                                      tags$li("Number of Apps Installed: Total apps available on the device."),
+                                      tags$li("Data Usage: Daily mobile data consumption in megabytes."),
+                                      tags$li("Age: Age of the user."),
+                                      tags$li("Gender: Gender of the user (Male or Female)."))),
+                     
+                     h5(tags$b("How to use the app:")),
+                     
+                     # ordered list
+                     tags$ol(
+                       tags$li("Subset the data by making selections on the sidepanel. To view the entire dataset, select 'Both' for device operating system and gender, and leave all other selections as is. Click 'Subset the Data!` once selections are made."),
+                       tags$li("The Data Download tab will provide a data table based on the selections you made to subset the data. A CSV file of the data table can be downloaded by clicking on the 'Download CSV' button."),
+                       tags$li("The Data Exploration tab lets you explore the dataset via numeric and categorical summaries and numerous types of plots. This tab is broken into many sub-tabs.",
+                               
+                               br(),
+                               br(),
+                               
+                               # List the sub-tabs and what they do
+                               tags$menu
+                               (tags$li("Summaries: This tab allows you to choose between numeric or categorical summaries, and allows you to select the variables you would like to summarize."),
+                                         tags$li("Barplot: This tab allows you to select a categorical variable and groups to generate a barplot."),
+                                         tags$li("Scatterplot: This tab allows you to generate a scatterplot by selecting the x and y variables of your choice, and selecting a category to color code the points."), 
+                                         tags$li("Boxplot: This tab allows you to generate a box plot by selecting the x and y variables of your choice, and selecting a subcategory."), 
+                                         tags$li("Violin Plot: This tab allows you to generate a plot that is a combination of a violin plot and a dot plot. X and y variables, and subcategory selections can be made."),
+                                         tags$li("Density Plot: This tab allows you to select a numeric variable and a group to generate a density plot."),
+                                         tags$li("Combo Plot: This tab allows you to generate a plot that is a combination of a scatterplot and a density plot. You can select the x and y variables, and a faceting group. "), 
+                                         tags$li("Correlation: This tab allows you to generate a correlation matrix by selecting at least two numeric variables.")
+                     ))),
+                     
                      h5(tags$b("Source:")),
                      
                      tags$p("The data is provided by Kaggle datasets expert, Vala Khorasani, and more information can be found here:"),
-                     tags$a(href = "https://www.kaggle.com/datasets/valakhorasani/mobile-device-usage-and-user-behavior-dataset", "Source Data Here")
+                     tags$a(href = "https://www.kaggle.com/datasets/valakhorasani/mobile-device-usage-and-user-behavior-dataset", "Source Data Here"),
+                     
+                     br(),
+                     br(),
+                     
+                     tags$small("This application was created by Kim Costello.")
                      
                      ),
             
