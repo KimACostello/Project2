@@ -120,7 +120,7 @@ ui <- fluidPage(
                      br(),
                      
                      h5(tags$b("Purpose:")),
-                     tags$p("     This Mobile Device Usage App allows you to subset and explore data about mobile device usage from 700 individual users. The dataset provides analysis of mobile usage patterns and user behvavior classification. "),
+                     tags$p("     This Mobile Device Usage App allows you to subset and explore data about mobile device usage from 700 individual users. The dataset provides analysis of mobile usage patterns and user behavior classification. "),
                      
                      tags$p("     Users are categorized into 1 of 5 User Behavior Classes based on usage patterns:"),
                      tags$menu(tags$li("1 = Low Usage"),
