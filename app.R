@@ -3,6 +3,7 @@ library(shiny)
 library(bslib)
 library(DT)
 library(dplyr)
+library(see)
 
 source("helpers.R")
 
@@ -230,6 +231,31 @@ ui <- fluidPage(
                      actionButton("go_boxplot", "Create boxplot!"),
                      
                      plotOutput(outputId = "boxplot")
+            ),
+            
+            tabPanel("Violin/Dot Plot", 
+                     
+                     # Allows user to select violin/dot plot options
+                     fluidRow(
+                       column(4,selectInput(inputId = "violin_x",
+                                            label = "Select x variable:",
+                                            choices = clean_cat_vars[c(1,2)],
+                       )),
+                       
+                       column(4,selectInput(inputId = "violin_y",
+                                            label = "Select y variable:",
+                                            choices = clean_num_vars,
+                       )), 
+                       
+                       column(4,selectInput(inputId = "violin_fill",
+                                            label = "Select a subcategory:", 
+                                            choices = clean_cat_vars[c(3,4)],
+                       )),
+                     ),
+                     
+                     actionButton("go_violinplot", "Create voilin/dot plot!"),
+                     
+                     plotOutput(outputId = "violin_plot")
             )
             
             
@@ -432,6 +458,25 @@ server <- function(input, output, session) {
       geom_boxplot(aes(x = !!sym(x), y = !!sym(y), fill = !!sym(fill))) +
       scale_fill_manual(values = c("lightpink",
                                    "lightblue"))
+    })
+  })
+  
+  # Render violin/dot plot
+  observeEvent(input$go_violinplot, {
+    
+    output$violin_plot <- renderPlot({
+      
+      x <- isolate(input$violin_x)
+      y <- isolate(input$violin_y)
+      fill <- isolate(input$violin_fill)
+      
+      ggplot(data = subset_data$usage_data) +
+        geom_violindot(aes(x = !!sym(x),
+                           y = !!sym(y),
+                           fill = !!sym(fill)), 
+                       fill_dots = "black") +
+        theme_modern() +
+        scale_fill_material_d()
     })
   })
   
