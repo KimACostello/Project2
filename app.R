@@ -4,6 +4,8 @@ library(bslib)
 library(DT)
 library(dplyr)
 library(see)
+library(ggpointdensity)
+library(viridis)
 
 source("helpers.R")
 
@@ -118,6 +120,8 @@ ui <- fluidPage(
                        
                        tabPanel("Data Summaries", 
                                 
+                                br(),
+                                
                       # Allows user to select Numeric or Categorical Summaries
                                 selectInput("summaries",
                                             label = "Select type of summaries", 
@@ -157,6 +161,7 @@ ui <- fluidPage(
                                 
                        tabPanel("Barplot", 
                                 
+                                br(),
                                 
                                 #Allows user to select barplot options
                                 layout_columns(
@@ -185,6 +190,8 @@ ui <- fluidPage(
             
             tabPanel("Scatterplot", 
                      
+                     br(),
+                     
                      #Allows user to select scatterplot options
                      fluidRow(
                        column(4,selectInput(inputId = "scatter_x",
@@ -210,6 +217,8 @@ ui <- fluidPage(
             
             tabPanel("Boxplot", 
                      
+                     br(),
+                     
                      # Allows user to select box plot options
                      fluidRow(
                        column(4,selectInput(inputId = "box_x",
@@ -233,7 +242,9 @@ ui <- fluidPage(
                      plotOutput(outputId = "boxplot")
             ),
             
-            tabPanel("Violin/Dot Plot", 
+            tabPanel("Violin/Dot Plot",
+                     
+                     br(),
                      
                      # Allows user to select violin/dot plot options
                      fluidRow(
@@ -256,6 +267,38 @@ ui <- fluidPage(
                      actionButton("go_violinplot", "Create voilin/dot plot!"),
                      
                      plotOutput(outputId = "violin_plot")
+            ),
+            
+            tabPanel("Combo Plot",
+                     
+                     br(),
+                     
+                     "This plot is a cross between a Scatterplot and a Density Plot.",
+                     
+                     br(),
+                     br(),
+                     
+                     # Allows user to select combo plot options
+                     fluidRow(
+                       column(4,selectInput(inputId = "combo_x",
+                                            label = "Select x variable:",
+                                            choices = combo_num_vars[c(4,6)],
+                       )),
+                       
+                       column(4,selectInput(inputId = "combo_y",
+                                            label = "Select y variable:",
+                                            choices = combo_num_vars[c(1,2,3,5)],
+                       )), 
+                       
+                       column(4,selectInput(inputId = "combo_facet",
+                                            label = "Select a faceting group:", 
+                                            choices = clean_cat_vars[-5],
+                       )),
+                     ),
+                     
+                     actionButton("go_comboplot", "Create combo plot!"),
+                     
+                     plotOutput(outputId = "combo_plot")
             )
             
             
@@ -480,6 +523,23 @@ server <- function(input, output, session) {
         labs(dictionary = var_dictionary) +
         theme_modern() +
         scale_fill_material_d()
+    })
+  })
+  
+  # Render the combo plot
+  observeEvent(input$go_comboplot, {
+    
+    output$combo_plot <- renderPlot({
+      
+      x <- isolate(input$combo_x)
+      y <- isolate(input$combo_y)
+      facet <- isolate(input$combo_facet)
+      
+      ggplot(data = subset_data$usage_data) +
+        geom_pointdensity(aes(x = !!sym(x), y = !!sym(y))) +
+        scale_color_viridis() +
+        labs(dictionary = var_dictionary) +
+        facet_wrap(~ get(facet))
     })
   })
   

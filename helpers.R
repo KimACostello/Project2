@@ -25,6 +25,13 @@ clean_num_vars <- c("App Usage (min/day)" = "App Usage Time Min Day",
                   "# of Apps Installed" = "Number of Apps Installed",
                   "Data Usage (MB/day)" = "Data Usage Mb Day")
 
+combo_num_vars <- c("App Usage (min/day)" = "App Usage Time Min Day",
+                    "Screen Time (hours/day)" = "Screen on Time Hours Day",
+                    "Battery Drain (mAh/day)" = "Battery Drain m Ah Day",
+                    "# of Apps Installed" = "Number of Apps Installed",
+                    "Data Usage (MB/day)" = "Data Usage Mb Day",
+                    "Age" = "Age")
+
 behavior_vals <- c("Low" = "1",
                    "Low-Moderate" = "2",
                    "Moderate" = "3",
@@ -48,6 +55,7 @@ var_dictionary <- c("User Behavior Class" = "User Behavior Class",
                     "User ID" = "User ID",
                     "App Usage Time Min Day" = "App Usage (min/day)",
                     "Screen on Time Hours Day" = "Screen Time (hours/day)",
-                   "Battery Drain m Ah Day" =  "Battery Drain (mAh/day)",
+                    "Battery Drain m Ah Day" =  "Battery Drain (mAh/day)",
                     "Number of Apps Installed" = "# of Apps Installed",
-                    "Data Usage Mb Day" = "Data Usage (MB/day)")
+                    "Data Usage Mb Day" = "Data Usage (MB/day)",
+                    "Age" = "Age")
