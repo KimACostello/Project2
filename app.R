@@ -111,6 +111,7 @@ ui <- fluidPage(
         mainPanel(
           tabsetPanel(
             
+            # About Tab
             tabPanel("About",
                      
                      br(),
@@ -123,6 +124,8 @@ ui <- fluidPage(
                      tags$p("     This Mobile Device Usage App allows you to subset and explore data about mobile device usage from 700 individual users. The dataset provides analysis of mobile usage patterns and user behavior classification. "),
                      
                      tags$p("     Users are categorized into 1 of 5 User Behavior Classes based on usage patterns:"),
+                     
+                     # List of User Behavior Classes
                      tags$menu(tags$li("1 = Low Usage"),
                                tags$li("2 = Low-Moderate Usage"),
                                tags$li("3 = Moderate Usage"),
@@ -132,6 +135,8 @@ ui <- fluidPage(
                      br(),
                      
                      tags$p("Other key features of this dataset include:",
+                            
+                            # List of variables 
                             tags$menu(tags$li("User ID: Unique identifier for each user."),
                                       tags$li("Device Model: Model of the user's smartphone."),
                                       tags$li("Operating System: The OS of the device (iOS or Android)."),
@@ -169,6 +174,8 @@ ui <- fluidPage(
                      h5(tags$b("Source:")),
                      
                      tags$p("The data is provided by Kaggle datasets expert, Vala Khorasani, and more information can be found here:"),
+                     
+                     # Provides link to the data source
                      tags$a(href = "https://www.kaggle.com/datasets/valakhorasani/mobile-device-usage-and-user-behavior-dataset", "Source Data Here"),
                      
                      br(),
@@ -261,6 +268,8 @@ ui <- fluidPage(
                                 actionButton("go_barplot", "Create barplot!"),
                                 
                                 useShinyjs(), #must be included in UI for shinyjs functions to work
+                                
+                                # Message will display until create plot button is clicked.
                                 div(id = "barplot_message",
                                     p("Please select variable and groups, then click button 'Create barplot!' to generate plot.")),
                                 
@@ -292,6 +301,7 @@ ui <- fluidPage(
                      
                      actionButton("go_scatterplot", "Create scatterplot!"),
                      
+                     # Message will display until create plot button is clicked.
                      div(id = "scatterplot_message",
                          p("Please select variables and category, then click button 'Create scatterplot!' to generate plot.")),
                      
@@ -322,6 +332,7 @@ ui <- fluidPage(
                      
                      actionButton("go_boxplot", "Create boxplot!"),
                      
+                     # Message will display until create plot button is clicked.
                      div(id = "boxplot_message",
                          p("Please select variables and category, then click button 'Create boxplot!' to generate plot.")),
                      
@@ -357,6 +368,7 @@ ui <- fluidPage(
                      
                      actionButton("go_violinplot", "Create voilin/dot plot!"),
                      
+                     # Message will display until create plot button is clicked.
                      div(id = "violinplot_message",
                          p("Please select variables and subcategory, then click button 'Create violin/dot plot!' to generate plot.")),
                      
@@ -382,6 +394,7 @@ ui <- fluidPage(
                      
                      actionButton("go_densityplot", "Create density plot!"),
                      
+                     # Message will display until create plot button is clicked.
                      div(id = "density_message",
                          p("Please select variable and group, then click button 'Create density plot!' to generate plot.")),
                      
@@ -417,6 +430,7 @@ ui <- fluidPage(
                      
                      actionButton("go_comboplot", "Create combo plot!"),
                      
+                     # Message will display until create plot button is clicked.
                      div(id = "combo_message",
                          p("Please select variables and group, then click button 'Create combo plot!' to generate plot.")),
                      
@@ -436,6 +450,8 @@ ui <- fluidPage(
                        ),
                        
                        column(9,plotOutput(outputId = "corr_plot"),
+                              
+                              # Message will display until create matrix button is clicked.
                               div(id = "corr_message",
                                   p("Please select variables, then click button 'Create correlation matrix!' to generate plot.")),
                               )
@@ -450,7 +466,7 @@ ui <- fluidPage(
     )
 
 
-#Read in data
+#Read in data and set type for variables
 mobile_usage <- read_csv("user_behavior_dataset.csv")
 mobile_usage <- mobile_usage |>
   clean_names("snake") |>
@@ -529,6 +545,7 @@ server <- function(input, output, session) {
   
   output$subsetted_data <- renderDataTable({
     
+    # Message to display until subset button is clicked.
     validate(
       need(!is.null(subset_data$usage_data), 
            "Please select your variables and click the 'Subset the Data!' button.")
@@ -599,6 +616,7 @@ server <- function(input, output, session) {
     
     output$barplot <- renderPlot({
       
+      # Message if subset button is not clicked.
       validate(
         need(!is.null(subset_data$usage_data), 
              "Please subset the data using the side panel and click the 'Subset the Data!' button.")
@@ -627,6 +645,7 @@ server <- function(input, output, session) {
     
     output$scatterplot <- renderPlot({
       
+      # Message if subset button is not clicked.
       validate(
         need(!is.null(subset_data$usage_data), 
              "Please subset the data using the side panel and click the 'Subset the Data!' button.")
@@ -655,6 +674,7 @@ server <- function(input, output, session) {
     
     output$boxplot <- renderPlot({
       
+      # Message if subset button is not clicked.
       validate(
         need(!is.null(subset_data$usage_data), 
              "Please subset the data using the side panel and click the 'Subset the Data!' button.")
@@ -679,6 +699,7 @@ server <- function(input, output, session) {
     
     output$violin_plot <- renderPlot({
       
+      # Message if subset button is not clicked.
       validate(
         need(!is.null(subset_data$usage_data), 
              "Please subset the data using the side panel and click the 'Subset the Data!' button.")
@@ -706,6 +727,7 @@ server <- function(input, output, session) {
     
     output$density_plot <- renderPlot({
       
+      # Message if subset button is not clicked.
       validate(
         need(!is.null(subset_data$usage_data), 
              "Please subset the data using the side panel and click the 'Subset the Data!' button.")
@@ -730,6 +752,7 @@ server <- function(input, output, session) {
     
     output$combo_plot <- renderPlot({
       
+      # Message if subset button is not clicked.
       validate(
         need(!is.null(subset_data$usage_data), 
              "Please subset the data using the side panel and click the 'Subset the Data!' button.")
@@ -754,6 +777,7 @@ server <- function(input, output, session) {
     
     output$corr_plot <- renderPlot({
       
+      # Message if subset button is not clicked.
       validate(
         need(!is.null(subset_data$usage_data), 
              "Please subset the data using the side panel and click the 'Subset the Data!' button.")
