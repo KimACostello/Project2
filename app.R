@@ -269,6 +269,28 @@ ui <- fluidPage(
                      plotOutput(outputId = "violin_plot")
             ),
             
+            tabPanel("Density Plot",
+                     
+                     br(),
+                     
+                     # Allows user to select density plot options
+                     fluidRow(
+                       column(6,selectInput(inputId = "density_x",
+                                            label = "Select variable:",
+                                            choices = combo_num_vars,
+                       )),
+                       
+                       column(6,selectInput(inputId = "density_fill",
+                                            label = "Select group:",
+                                            choices = clean_cat_vars[-5],
+                       ))
+                     ),
+                     
+                     actionButton("go_densityplot", "Create density plot!"),
+                     
+                     plotOutput(outputId = "density_plot")
+            ),
+            
             tabPanel("Combo Plot",
                      
                      br(),
@@ -525,7 +547,24 @@ server <- function(input, output, session) {
         scale_fill_material_d()
     })
   })
+
+  # Render the density plot
+  observeEvent(input$go_densityplot, {
+    
+    output$density_plot <- renderPlot({
+      
+      x <- isolate(input$density_x)
+      fill <- isolate(input$density_fill)
+      
+      ggplot(data = subset_data$usage_data) +
+        geom_density(aes(x = !!sym(x), fill = !!sym(fill)), 
+                     alpha = 0.3) +
+        scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
+        labs(dictionary = var_dictionary)
+    })
+  })
   
+    
   # Render the combo plot
   observeEvent(input$go_comboplot, {
     
