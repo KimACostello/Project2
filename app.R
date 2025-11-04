@@ -11,6 +11,7 @@ ui <- fluidPage(
 
     # Application title
     titlePanel("Mobile Device Usage Dataset"),
+    theme = bs_theme(preset = "yeti"),
 
     # Sidebar
     sidebarLayout(
@@ -154,20 +155,24 @@ ui <- fluidPage(
                                 
                        tabPanel("Plots", 
                                 
-                                selectInput(inputId = "bar_x",
+                                layout_columns(
+                                card(radioButtons(inputId = "bar_x",
                                             label = "Select variable for barplot:",
                                             choices = clean_cat_vars[-5]
-                                            ),
+                                            )),
                                 
-                                selectInput(inputId = "bar_fill",
+                                card(radioButtons(inputId = "bar_fill",
                                             label = "Select a subgroup:",
                                             choices = clean_cat_vars[-5]
-                                            ), 
+                                            )), 
                                 
-                                selectInput(inputId = "bar_facet",
+                                card(radioButtons(inputId = "bar_facet",
                                             label = "Select faceting group:", 
                                             choices = clean_cat_vars[-5]
-                                            ),
+                                            )),
+                                row_heights = c(5,5,5)),
+                                
+                                actionButton("go_barplot", "Create barplot!"),
                                 
                                 plotOutput(outputId = "barplot")
                                 ))))
@@ -218,7 +223,7 @@ server <- function(input, output, session) {
       } else if(input$opsystem == "iOS"){
         os_sub <- opsystem_vals[2]
       } else{
-        os_sub <- opsystem_vals
+        os_sub <- c(opsystem_vals[1], opsystem_vals[2])
       }
       
       if(input$gender == "Male"){
@@ -226,15 +231,15 @@ server <- function(input, output, session) {
       } else if(input$gender == "Female"){
         gender_sub <- gender_vals[2]
       } else{
-        gender_sub <- gender_vals
+        gender_sub <- c(gender_vals[1], gender_vals[2])
       }
     
     num1_col <- mobile_usage[[input$num_var1]]
     num2_col <- mobile_usage[[input$num_var2]]
     
     filtered_data <- mobile_usage |>
-        filter(operating_system == os_sub,
-               gender == gender_sub,
+        filter(operating_system %in% os_sub,
+               gender %in% gender_sub,
                user_behavior_class %in% input$behavior_class,
                num1_col >= input$slider1[1],
                num1_col <= input$slider1[2],
@@ -309,12 +314,16 @@ server <- function(input, output, session) {
   
   output$barplot <- renderPlot({
     
+    input$go_barplot
+
+    x <- isolate(input$bar_x)
+    fill <- isolate(input$bar_fill)
+    
     ggplot(data = subset_data$usage_data) +
-      geom_bar(aes(x = input$bar_x, fill = input$bar_fill), 
-               position = "dodge", 
+      geom_bar(aes(x =!!sym(x), fill = !!sym(fill)),
+               position = "dodge",
                color = "black", 
-               alpha = 0.6) +
-      facet_wrap(~ input$bar_facet)
+               alpha = 0.6)
   })
   
   
