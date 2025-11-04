@@ -419,7 +419,7 @@ server <- function(input, output, session) {
                  position = "dodge",
                  color = "black", 
                  alpha = 0.6) +
-        facet_wrap(~ get(facet))
+        facet_wrap(~ get(facet)) 
     })
   })
   
@@ -440,6 +440,7 @@ server <- function(input, output, session) {
                        color = !!sym(color))) +
         scale_color_manual(values = c("#FFFF00",
                                       "#FF00FF")) +
+        labs(dictionary = var_dictionary) +      # looks up variables in dictionary for display name
         theme_dark()
     })
   })
@@ -457,7 +458,8 @@ server <- function(input, output, session) {
     ggplot(data = subset_data$usage_data) +
       geom_boxplot(aes(x = !!sym(x), y = !!sym(y), fill = !!sym(fill))) +
       scale_fill_manual(values = c("lightpink",
-                                   "lightblue"))
+                                   "lightblue")) +
+      labs(dictionary = var_dictionary)
     })
   })
   
@@ -465,7 +467,7 @@ server <- function(input, output, session) {
   observeEvent(input$go_violinplot, {
     
     output$violin_plot <- renderPlot({
-      
+
       x <- isolate(input$violin_x)
       y <- isolate(input$violin_y)
       fill <- isolate(input$violin_fill)
@@ -475,6 +477,7 @@ server <- function(input, output, session) {
                            y = !!sym(y),
                            fill = !!sym(fill)), 
                        fill_dots = "black") +
+        labs(dictionary = var_dictionary) +
         theme_modern() +
         scale_fill_material_d()
     })

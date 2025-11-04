@@ -40,3 +40,14 @@ devicemodel_vals <- c("Google Pixel 5",
                       "Samsung Galaxy S21")
 
 gender_vals <- c("Male", "Female")
+
+var_dictionary <- c("User Behavior Class" = "User Behavior Class",
+                    "Device Model" = "Device Model",
+                    "Operating System" = "Operating System",
+                    "Gender" = "Gender",
+                    "User ID" = "User ID",
+                    "App Usage Time Min Day" = "App Usage (min/day)",
+                    "Screen on Time Hours Day" = "Screen Time (hours/day)",
+                   "Battery Drain m Ah Day" =  "Battery Drain (mAh/day)",
+                    "Number of Apps Installed" = "# of Apps Installed",
+                    "Data Usage Mb Day" = "Data Usage (MB/day)")
