@@ -12,6 +12,7 @@ library(viridis)
 library(GGally)
 library(shinyalert)
 library(ggplot2)
+library(shinyjs)
 
 source("helpers.R")
 
@@ -118,7 +119,10 @@ ui <- fluidPage(
                      dataTableOutput(outputId = "subsetted_data"),
                      
                      # Allows user to download the data as a CSV file
-                     downloadButton("download_data", "Download CSV")
+                     layout_columns(
+                       card(downloadButton("download_data", "Download CSV")),
+                       col_widths = c(-9, 3)
+                     )
                      ), 
             
             tabPanel("Data Exploration", 
@@ -191,6 +195,11 @@ ui <- fluidPage(
                                 
                                 actionButton("go_barplot", "Create barplot!"),
                                 
+                                useShinyjs(), #must be included in UI for shinyjs functions to work
+                                div(id = "barplot_message",
+                                    p("Please select variable and groups, then click button 'Create barplot!' to generate plot.")),
+                                
+                                
                                 plotOutput(outputId = "barplot")
                                 ),
             
@@ -218,6 +227,9 @@ ui <- fluidPage(
                      
                      actionButton("go_scatterplot", "Create scatterplot!"),
                      
+                     div(id = "scatterplot_message",
+                         p("Please select variables and category, then click button 'Create scatterplot!' to generate plot.")),
+                     
                      plotOutput(outputId = "scatterplot"),
                      ),
             
@@ -244,6 +256,9 @@ ui <- fluidPage(
                      ),
                      
                      actionButton("go_boxplot", "Create boxplot!"),
+                     
+                     div(id = "boxplot_message",
+                         p("Please select variables and category, then click button 'Create boxplot!' to generate plot.")),
                      
                      plotOutput(outputId = "boxplot")
             ),
@@ -277,6 +292,9 @@ ui <- fluidPage(
                      
                      actionButton("go_violinplot", "Create voilin/dot plot!"),
                      
+                     div(id = "violinplot_message",
+                         p("Please select variables and subcategory, then click button 'Create violin/dot plot!' to generate plot.")),
+                     
                      plotOutput(outputId = "violin_plot")
             ),
             
@@ -298,6 +316,9 @@ ui <- fluidPage(
                      ),
                      
                      actionButton("go_densityplot", "Create density plot!"),
+                     
+                     div(id = "density_message",
+                         p("Please select variable and group, then click button 'Create density plot!' to generate plot.")),
                      
                      plotOutput(outputId = "density_plot")
             ),
@@ -331,6 +352,9 @@ ui <- fluidPage(
                      
                      actionButton("go_comboplot", "Create combo plot!"),
                      
+                     div(id = "combo_message",
+                         p("Please select variables and group, then click button 'Create combo plot!' to generate plot.")),
+                     
                      plotOutput(outputId = "combo_plot")
             ),
             
@@ -346,7 +370,9 @@ ui <- fluidPage(
                               actionButton("go_corrplot", "Create correlation matrix!")
                        ),
                        
-                       column(9,plotOutput(outputId = "corr_plot")
+                       column(9,plotOutput(outputId = "corr_plot"),
+                              div(id = "corr_message",
+                                  p("Please select variables, then click button 'Create correlation matrix!' to generate plot.")),
                               )
                        )
                      )
@@ -436,18 +462,26 @@ server <- function(input, output, session) {
       
     })
   
-  output$subsetted_data <- renderDataTable(subset_data$usage_data)
+  output$subsetted_data <- renderDataTable({
+    
+    validate(
+      need(!is.null(subset_data$usage_data), 
+           "Please select your variables and click the 'Subset the Data!' button.")
+    )
+    
+    subset_data$usage_data
+    })
   
   
   #Allows user to download the data table
   output$download_data <- downloadHandler(
     filename = function(){
       paste('mobile_usage_data-',Sys.Date(), '.csv', sep = '')
-    },
+      },
     content = function(con){
       write.csv(subset_data$usage_data, con)
-    }
-  )
+      }
+    )
   
 
   # Render the contingency table dynamically
@@ -496,7 +530,14 @@ server <- function(input, output, session) {
   # Render barplot
   observeEvent(input$go_barplot, {
     
+    hide("barplot_message")  # This will hide the message after the button is clicked
+    
     output$barplot <- renderPlot({
+      
+      validate(
+        need(!is.null(subset_data$usage_data), 
+             "Please subset the data using the side panel and click the 'Subset the Data!' button.")
+      )
       
       x <- isolate(input$bar_x)
       fill <- isolate(input$bar_fill)
@@ -517,7 +558,14 @@ server <- function(input, output, session) {
   
   observeEvent(input$go_scatterplot, {
     
+    hide("scatterplot_message")  # This will hide the message after the button is clicked
+    
     output$scatterplot <- renderPlot({
+      
+      validate(
+        need(!is.null(subset_data$usage_data), 
+             "Please subset the data using the side panel and click the 'Subset the Data!' button.")
+      )
       
       x <- isolate(input$scatter_x)
       y <- isolate(input$scatter_y)
@@ -538,7 +586,14 @@ server <- function(input, output, session) {
   # Render boxplot
   observeEvent(input$go_boxplot, {
     
+    hide("boxplot_message")  # This will hide the message after the button is clicked
+    
     output$boxplot <- renderPlot({
+      
+      validate(
+        need(!is.null(subset_data$usage_data), 
+             "Please subset the data using the side panel and click the 'Subset the Data!' button.")
+      )
     
     x <- isolate(input$box_x)
     y <- isolate(input$box_y)
@@ -555,7 +610,14 @@ server <- function(input, output, session) {
   # Render violin/dot plot
   observeEvent(input$go_violinplot, {
     
+    hide("violinplot_message")  # This will hide the message after the button is clicked
+    
     output$violin_plot <- renderPlot({
+      
+      validate(
+        need(!is.null(subset_data$usage_data), 
+             "Please subset the data using the side panel and click the 'Subset the Data!' button.")
+      )
 
       x <- isolate(input$violin_x)
       y <- isolate(input$violin_y)
@@ -575,7 +637,14 @@ server <- function(input, output, session) {
   # Render the density plot
   observeEvent(input$go_densityplot, {
     
+    hide("density_message")  # This will hide the message after the button is clicked
+    
     output$density_plot <- renderPlot({
+      
+      validate(
+        need(!is.null(subset_data$usage_data), 
+             "Please subset the data using the side panel and click the 'Subset the Data!' button.")
+      )
       
       x <- isolate(input$density_x)
       fill <- isolate(input$density_fill)
@@ -592,7 +661,14 @@ server <- function(input, output, session) {
   # Render the combo plot
   observeEvent(input$go_comboplot, {
     
+    hide("combo_message")  # This will hide the message after the button is clicked
+    
     output$combo_plot <- renderPlot({
+      
+      validate(
+        need(!is.null(subset_data$usage_data), 
+             "Please subset the data using the side panel and click the 'Subset the Data!' button.")
+      )
       
       x <- isolate(input$combo_x)
       y <- isolate(input$combo_y)
@@ -609,7 +685,14 @@ server <- function(input, output, session) {
   # Render the correlation matrix
   observeEvent(input$go_corrplot, {
     
+    hide("corr_message")  # This will hide the message after the button is clicked
+    
     output$corr_plot <- renderPlot({
+      
+      validate(
+        need(!is.null(subset_data$usage_data), 
+             "Please subset the data using the side panel and click the 'Subset the Data!' button.")
+      )
       
       x <- isolate(input$corr_vars)
       
