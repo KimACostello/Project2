@@ -59,7 +59,7 @@ ui <- fluidPage(
             
             br(),
             
-            h4("Choose your numeric variables!"),
+            h4("Choose your numeric variables."),
             
             #Allows user to select a numeric variable
             selectInput(inputId = "num_var1",
@@ -204,9 +204,32 @@ ui <- fluidPage(
                      
                      actionButton("go_scatterplot", "Create scatterplot!"),
                      
-                     plotOutput(outputId = "scatterplot")
+                     plotOutput(outputId = "scatterplot"),
+                     ),
+            
+            tabPanel("Boxplot", 
                      
+                     # Allows user to select box plot options
+                     fluidRow(
+                       column(4,selectInput(inputId = "box_x",
+                                            label = "Select x variable:",
+                                            choices = clean_cat_vars[c(1,2)],
+                       )),
+                       
+                       column(4,selectInput(inputId = "box_y",
+                                            label = "Select y variable:",
+                                            choices = clean_num_vars,
+                       )), 
+                       
+                       column(4,selectInput(inputId = "box_fill",
+                                            label = "Select a subcategory:", 
+                                            choices = clean_cat_vars[c(3,4)],
+                       )),
+                     ),
                      
+                     actionButton("go_boxplot", "Create boxplot!"),
+                     
+                     plotOutput(outputId = "boxplot")
             )
             
             
@@ -356,40 +379,60 @@ server <- function(input, output, session) {
    
   })
   # Render barplot
-  output$barplot <- renderPlot({
+  observeEvent(input$go_barplot, {
     
-    input$go_barplot
-
-    x <- isolate(input$bar_x)
-    fill <- isolate(input$bar_fill)
-    facet <- isolate(input$bar_facet)
-
-    
-    ggplot(data = subset_data$usage_data) +
-      geom_bar(aes(x =!!sym(x), fill = !!sym(fill)),
-               position = "dodge",
-               color = "black", 
-               alpha = 0.6) +
-      facet_wrap(~ get(facet))
+    output$barplot <- renderPlot({
+      
+      x <- isolate(input$bar_x)
+      fill <- isolate(input$bar_fill)
+      facet <- isolate(input$bar_facet)
+      
+      
+      ggplot(data = subset_data$usage_data) +
+        geom_bar(aes(x =!!sym(x), fill = !!sym(fill)),
+                 position = "dodge",
+                 color = "black", 
+                 alpha = 0.6) +
+        facet_wrap(~ get(facet))
+    })
   })
   
+  
   # Render scatterplot
-  output$scatterplot <- renderPlot({
+  
+  observeEvent(input$go_scatterplot, {
     
-    input$go_scatterplot
+    output$scatterplot <- renderPlot({
+      
+      x <- isolate(input$scatter_x)
+      y <- isolate(input$scatter_y)
+      color <- isolate(input$scatter_color)
+      
+      ggplot(data = subset_data$usage_data) +
+        geom_point(aes(x = !!sym(x), 
+                       y = !!sym(y), 
+                       color = !!sym(color))) +
+        scale_color_manual(values = c("#FFFF00",
+                                      "#FF00FF")) +
+        theme_dark()
+    })
+  })
+
+  
+  # Render boxplot
+  observeEvent(input$go_boxplot, {
     
-    x <- isolate(input$scatter_x)
-    y <- isolate(input$scatter_y)
-    color <- isolate(input$scatter_color)
+    output$boxplot <- renderPlot({
+    
+    x <- isolate(input$box_x)
+    y <- isolate(input$box_y)
+    fill <- isolate(input$box_fill)
     
     ggplot(data = subset_data$usage_data) +
-      geom_point(aes(x = !!sym(x), 
-                   y = !!sym(y), 
-                   color = !!sym(color))) +
-      scale_color_manual(values = c("#FFFF00",
-                                    "#FF00FF")) +
-      theme_dark()
-    
+      geom_boxplot(aes(x = !!sym(x), y = !!sym(y), fill = !!sym(fill))) +
+      scale_fill_manual(values = c("lightpink",
+                                   "lightblue"))
+    })
   })
   
   
