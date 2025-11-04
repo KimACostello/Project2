@@ -185,7 +185,13 @@ ui <- fluidPage(
 
 #Read in data
 mobile_usage <- read_csv("user_behavior_dataset.csv")
-mobile_usage <- clean_names(mobile_usage, "snake")
+mobile_usage <- mobile_usage |>
+  clean_names("snake") |>
+  mutate(behavior_class = as.factor(user_behavior_class),
+         device_model = as.factor(device_model),
+         operating_system = as.factor(operating_system),
+         user_id = as.character(user_id),
+         user_behavior_class = as.factor(user_behavior_class))
 
 # Define server logic 
 server <- function(input, output, session) {
@@ -318,12 +324,15 @@ server <- function(input, output, session) {
 
     x <- isolate(input$bar_x)
     fill <- isolate(input$bar_fill)
+    facet <- isolate(input$bar_facet)
+
     
     ggplot(data = subset_data$usage_data) +
       geom_bar(aes(x =!!sym(x), fill = !!sym(fill)),
                position = "dodge",
                color = "black", 
-               alpha = 0.6)
+               alpha = 0.6) +
+      facet_wrap(~ get(facet))
   })
   
   
