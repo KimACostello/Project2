@@ -123,7 +123,7 @@ ui <- fluidPage(
                                             choices = c("Categorical", "Numeric"),
                                             selected = "Categorical"),
                                 
-                      # If Categorical is chosen, this will ask for user to select                       # which categorical variables
+            # If Categorical is chosen, this will ask for user to select which categorical variables
                                 conditionalPanel(
                                   condition = "input.summaries == 'Categorical'",
                                   checkboxGroupInput(inputId = "categorical_vars",
@@ -134,14 +134,15 @@ ui <- fluidPage(
                                   # Output contingency table for selected cat vars
                                   uiOutput("contingency_table_output")
                                   ),
-                      
+            # If Numeric is chosen, this will ask for user to select which numeric variables
                       conditionalPanel(
                         condition = "input.summaries == 'Numeric'",
                         checkboxGroupInput(inputId = "numeric_var_options",
                                            label = "Select numeric variables
                                                      to summarize:",
                                            choices = clean_num_vars),
-                        
+                       
+                        #Allows user to select a grouping for the numeric summaries 
                         selectInput(inputId = "group",
                                     label = "Select Group:",
                                     choices = clean_cat_vars[-5]),
@@ -153,8 +154,10 @@ ui <- fluidPage(
                                 ),
                                 
                                 
-                       tabPanel("Plots", 
+                       tabPanel("Barplot", 
                                 
+                                
+                                #Allows user to select barplot options
                                 layout_columns(
                                 card(radioButtons(inputId = "bar_x",
                                             label = "Select variable for barplot:",
@@ -163,19 +166,54 @@ ui <- fluidPage(
                                 
                                 card(radioButtons(inputId = "bar_fill",
                                             label = "Select a subgroup:",
-                                            choices = clean_cat_vars[-5]
+                                            choices = clean_cat_vars[-5],
+                                            selected = "Operating System"
                                             )), 
                                 
                                 card(radioButtons(inputId = "bar_facet",
                                             label = "Select faceting group:", 
-                                            choices = clean_cat_vars[-5]
+                                            choices = clean_cat_vars[-5],
+                                            selected = "Gender"
                                             )),
                                 row_heights = c(5,5,5)),
                                 
                                 actionButton("go_barplot", "Create barplot!"),
                                 
                                 plotOutput(outputId = "barplot")
-                                ))))
+                                ),
+            
+            tabPanel("Scatterplot", 
+                     
+                     #Allows user to select scatterplot options
+                     fluidRow(
+                       column(4,selectInput(inputId = "scatter_x",
+                                         label = "Select x variable:",
+                                         choices = clean_num_vars[c(1,2,3)]
+                       )),
+                       
+                       column(4,selectInput(inputId = "scatter_y",
+                                         label = "Select y variable:",
+                                         choices = clean_num_vars[c(4,5)],
+                       )), 
+                       
+                       column(4,selectInput(inputId = "scatter_color",
+                                         label = "Select a category for color coding:", 
+                                         choices = clean_cat_vars[c(3,4)]
+                       )),
+                       ),
+                     
+                     actionButton("go_scatterplot", "Create scatterplot!"),
+                     
+                     plotOutput(outputId = "scatterplot")
+                     
+                     
+            )
+            
+            
+            
+            
+            
+            )))
           )
            
         )
@@ -317,7 +355,7 @@ server <- function(input, output, session) {
     })
    
   })
-  
+  # Render barplot
   output$barplot <- renderPlot({
     
     input$go_barplot
@@ -335,7 +373,24 @@ server <- function(input, output, session) {
       facet_wrap(~ get(facet))
   })
   
-  
+  # Render scatterplot
+  output$scatterplot <- renderPlot({
+    
+    input$go_scatterplot
+    
+    x <- isolate(input$scatter_x)
+    y <- isolate(input$scatter_y)
+    color <- isolate(input$scatter_color)
+    
+    ggplot(data = subset_data$usage_data) +
+      geom_point(aes(x = !!sym(x), 
+                   y = !!sym(y), 
+                   color = !!sym(color))) +
+      scale_color_manual(values = c("#FFFF00",
+                                    "#FF00FF")) +
+      theme_dark()
+    
+  })
   
   
   
