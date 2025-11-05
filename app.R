@@ -134,7 +134,8 @@ ui <- fluidPage(
                      
                      br(),
                      
-                     tags$p("Other key features of this dataset include:",
+                     fluidRow(
+                       column(9,card(tags$p("Other key features of this dataset include:",
                             
                             # List of variables 
                             tags$menu(tags$li("User ID: Unique identifier for each user."),
@@ -146,7 +147,11 @@ ui <- fluidPage(
                                       tags$li("Number of Apps Installed: Total apps available on the device."),
                                       tags$li("Data Usage: Daily mobile data consumption in megabytes."),
                                       tags$li("Age: Age of the user."),
-                                      tags$li("Gender: Gender of the user (Male or Female)."))),
+                                      tags$li("Gender: Gender of the user (Male or Female)."))))),
+                       
+                       #Output the image
+                       column(3,imageOutput("phone_image"),
+                              tags$small("Credit: Delmaine Donson, Source: gettyimages"))),
                      
                      h5(tags$b("How to use the app:")),
                      
@@ -171,12 +176,12 @@ ui <- fluidPage(
                                          tags$li("Correlation: This tab allows you to generate a correlation matrix by selecting at least two numeric variables.")
                      ))),
                      
-                     h5(tags$b("Source:")),
+                     card(h5(tags$b("Source:")),
                      
                      tags$p("The data is provided by Kaggle datasets expert, Vala Khorasani, and more information can be found here:"),
                      
                      # Provides link to the data source
-                     tags$a(href = "https://www.kaggle.com/datasets/valakhorasani/mobile-device-usage-and-user-behavior-dataset", "Source Data Here"),
+                     tags$a(href = "https://www.kaggle.com/datasets/valakhorasani/mobile-device-usage-and-user-behavior-dataset", "Source Data Here")),
                      
                      br(),
                      br(),
@@ -476,10 +481,23 @@ mobile_usage <- mobile_usage |>
          user_id = as.character(user_id),
          user_behavior_class = as.factor(user_behavior_class))
 
+
+
 # Define server logic 
 server <- function(input, output, session) {
-
   
+  
+  # Render image
+  output$phone_image <- renderImage({
+    
+    list(src = "phone_image.jpg",
+         alt ="",
+         height = "385",
+         deleteFile = FALSE
+         )
+  })
+  
+
   observe({
   
 # Updating Slider1 widget based on selection of first numeric variable    
