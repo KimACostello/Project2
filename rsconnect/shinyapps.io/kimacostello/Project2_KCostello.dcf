@@ -5,7 +5,7 @@ account: kimacostello
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 15964067
-bundleId: 11130807
+bundleId: 11135399
 url: https://kimacostello.shinyapps.io/Project2_KCostello/
 version: 1
 asMultiple: FALSE
