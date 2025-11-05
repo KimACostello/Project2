@@ -13,6 +13,7 @@ library(GGally)
 library(shinyalert)
 library(ggplot2)
 library(shinyjs)
+library(shinycssloaders)
 
 source("helpers.R")
 
@@ -193,7 +194,7 @@ ui <- fluidPage(
             tabPanel("Data Download", 
                      
                      # Output the data table based on selections in side panel
-                     dataTableOutput(outputId = "subsetted_data"),
+                     withSpinner(dataTableOutput(outputId = "subsetted_data")),
                      
                      # Allows user to download the data as a CSV file
                      layout_columns(
@@ -241,7 +242,7 @@ ui <- fluidPage(
                         
                         # Output numeric summaries for selected numeric vars
                         uiOutput("numeric_summaries_output")
-                      )
+                       )
                                   
                                 ),
                                 
@@ -279,8 +280,8 @@ ui <- fluidPage(
                                     p("Please select variable and groups, then click button 'Create barplot!' to generate plot.")),
                                 
                                 
-                                plotOutput(outputId = "barplot")
-                                ),
+                                withSpinner(plotOutput(outputId = "barplot")
+                                )),
             
             tabPanel("Scatterplot", 
                      
@@ -310,8 +311,8 @@ ui <- fluidPage(
                      div(id = "scatterplot_message",
                          p("Please select variables and category, then click button 'Create scatterplot!' to generate plot.")),
                      
-                     plotOutput(outputId = "scatterplot"),
-                     ),
+                     withSpinner(plotOutput(outputId = "scatterplot"),
+                     )),
             
             tabPanel("Boxplot", 
                      
@@ -341,8 +342,8 @@ ui <- fluidPage(
                      div(id = "boxplot_message",
                          p("Please select variables and category, then click button 'Create boxplot!' to generate plot.")),
                      
-                     plotOutput(outputId = "boxplot")
-            ),
+                     withSpinner(plotOutput(outputId = "boxplot")
+            )),
             
             tabPanel("Violin Plot",
                      
@@ -377,8 +378,8 @@ ui <- fluidPage(
                      div(id = "violinplot_message",
                          p("Please select variables and subcategory, then click button 'Create violin/dot plot!' to generate plot.")),
                      
-                     plotOutput(outputId = "violin_plot")
-            ),
+                     withSpinner(plotOutput(outputId = "violin_plot")
+            )),
             
             tabPanel("Density Plot",
                      
@@ -403,8 +404,8 @@ ui <- fluidPage(
                      div(id = "density_message",
                          p("Please select variable and group, then click button 'Create density plot!' to generate plot.")),
                      
-                     plotOutput(outputId = "density_plot")
-            ),
+                     withSpinner(plotOutput(outputId = "density_plot")
+            )),
             
             tabPanel("Combo Plot",
                      
@@ -439,8 +440,8 @@ ui <- fluidPage(
                      div(id = "combo_message",
                          p("Please select variables and group, then click button 'Create combo plot!' to generate plot.")),
                      
-                     plotOutput(outputId = "combo_plot")
-            ),
+                     withSpinner(plotOutput(outputId = "combo_plot")
+            )),
             
             tabPanel("Correlation",
                      
@@ -454,7 +455,7 @@ ui <- fluidPage(
                               actionButton("go_corrplot", "Create correlation matrix!")
                        ),
                        
-                       column(9,plotOutput(outputId = "corr_plot"),
+                       column(9,withSpinner(plotOutput(outputId = "corr_plot")),
                               
                               # Message will display until create matrix button is clicked.
                               div(id = "corr_message",
